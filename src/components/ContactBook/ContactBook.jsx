@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+//import { styles } from 'components/ContactBook/ContactBook.module.css';
 
 class ContactBook extends Component {
   state = {
@@ -27,6 +28,15 @@ class ContactBook extends Component {
       id: Date.now().toString(),
     };
 
+    const existingContact = this.state.contacts.find(
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+    );
+
+    if (existingContact) {
+      alert(`${newContact.name} is already in contacts.`);
+      return;
+    }
+
     this.setState(prevState => ({
       contacts: [...prevState.contacts, newContact],
       name: '',
@@ -38,54 +48,76 @@ class ContactBook extends Component {
     this.setState({ filter: event.target.value });
   };
 
+  handleDeleteContact = contactId => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
+    }));
+  };
+
   getFilteredContacts() {
     const { contacts, filter } = this.state;
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
   }
-}
-const filteredContacts = this.getFilteredContacts();
-const { filter } = this.state;
-function render() {
-  return (
-    <div>
-      <h1>Phonebook</h1>
-      <form onSubmit={this.handleFormSubmit}>
-        <label>Name</label>
-        <input
-          type="text"
-          name="name"
-          pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$"
-          title="Name may contain only letters, apostrophe, dash, and spaces."
-          required
-          value={this.state.name}
-          onChange={this.handleInputChange}
-        />
-        <label>Number</label>
-        <input
-          type="tel"
-          name="number"
-          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-          title="Phone number must be digits and can contain spaces, dashes, parentheses, and can start with +"
-          required
-          value={this.state.number}
-          onChange={this.handleInputChange}
-        />
-        <button type="submit">Add Contact</button>
-      </form>
-      <h1>Contacts</h1>
-      <label>Find contacts by name</label>
-      <input type="text" value={filter} onChange={this.handleFind} />
-      <ul>
-        {filteredContacts.map(contact => (
-          <li key={contact.id}>
-            {contact.name}: {contact.number}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+
+  render() {
+    const filteredContacts = this.getFilteredContacts();
+    const { filter } = this.state;
+
+    return (
+      <div>
+        <h1>Phonebook</h1>
+        <form
+          onSubmit={this.handleFormSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <label>Name</label>
+          <input
+            type="text"
+            name="name"
+            pattern="^[a-zA-Z]+(([' -][a-zA-Z ])?[a-zA-Z]*)*$"
+            title="Name may contain only letters, apostrophe, dash, and spaces."
+            required
+            value={this.state.name}
+            onChange={this.handleInputChange}
+          />
+          <label>Number</label>
+          <input
+            type="tel"
+            name="number"
+            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+            title="Phone number must be digits and can contain spaces, dashes, parentheses, and can start with +"
+            required
+            value={this.state.number}
+            onChange={this.handleInputChange}
+          />
+          <button type="submit" style={{ marginTop: '20px' }}>
+            Add Contact
+          </button>
+        </form>
+        <h1>Contacts</h1>
+        <label style={{ paddingRight: '15px' }}>Find contacts by name</label>
+        <input type="text" value={filter} onChange={this.handleFind} />
+        <ul>
+          {filteredContacts.map(contact => (
+            <li key={contact.id}>
+              {contact.name}: {contact.number}
+              <button
+                onClick={() => this.handleDeleteContact(contact.id)}
+                style={{ marginLeft: '15px' }}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 }
 
 export default ContactBook;
